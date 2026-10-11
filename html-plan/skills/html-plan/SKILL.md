@@ -90,36 +90,11 @@ For a change with no visible behaviour, such as a refactor, make level 1 the gua
 
 The exhibits are the plan. Words only name them.
 
-**Write all prose in ASD-STE100 Simplified Technical English (STE). Use no other style.** This rule applies to claims, captions, pins, questions, options and notes.
+编写中文技术说明前，读取同级安装的 [ste-zh 写作规则](../ste-zh/SKILL.md)，按文本用途选择 Strict（严格）或中文-顺。这里只使用其写作规则，不运行 Python 检查器。保留事实、条件、范围和“可能／也许／大概”等情态，不为满足检查而补造数字或删除限定。代码、用户原话和原始界面文案保持原样；规则应用于新写的主张、图注、问题、选项和备注。若未安装 `ste-zh`，先安装 [AILHC 中文 STE 定制分支](https://github.com/AILHC/asd-ste100-skill-zh/tree/codex/chinese-ste)，不要退回旧中文词表。
 
-- **Approved words only.** Use a word only if the STE dictionary approves it, and only with its approved meaning and part of speech. If you are not sure about a word, use the most common short word that has the same meaning.
-- **Technical names and technical verbs are permitted.** Names from the code (`createScheduled()`, `scheduled_messages`), product names, UI labels and units are technical names. Verbs of the field (*compile*, *deploy*, *merge*, *render*) are technical verbs. Use the same name for the same thing each time.
-- **Short sentences.** One topic for each sentence. An instruction has 20 words at most. A description has 25 words at most. A paragraph has 6 sentences at most.
-- **Active voice.** Say who does what: “The worker claims the row.” Not “The row is claimed.”
-- **Simple tenses.** Use the present, the past and the future: *sends*, *sent*, *will send*. Do not write *has sent* or *is sending*. Do not use an *-ing* word unless it is part of a technical name.
-- **Instructions are commands.** “Run the migration.” Write one instruction in each sentence. Put the condition first: “If the claim fails, stop.”
-- **`must` and `can`.** Use *must* for a rule and *can* for what is possible. Do not use *should*, *may* or *might*.
-- **Noun groups of 3 words at most.** “The retry limit of the send worker.” Not “the send worker retry limit setting”.
-- **Full grammar.** Keep *the*, *a* and *an*. Do not use contractions, idioms, metaphors or jokes.
+中文按指定规则使用指令句 25 字、说明句 40 字的上限；保留必要精度优先于缩短句子。英文输出仍使用简洁技术英语，但不把 should、may、might 的含义强制改成 must、can。页面语言遵循用户要求，中文页面声明 `<html lang="zh-CN">`。
 
-| Do not write | Write |
-|---|---|
-| utilize, leverage | use |
-| perform, carry out | do |
-| ensure, verify, check (as a verb) | make sure |
-| demonstrate, indicate | show |
-| commence, begin · terminate | start · stop |
-| obtain · provide | get · give |
-| prior to · in order to | before · to |
-| however · additionally | but · also |
-| about 50 | approximately 50 |
-
-These are not STE and stay as they are: the words of the user in a `doc-quote`, code, and the text on a UI mockup.
-
-- A caption is one sentence: what to notice. A pin is a clause. An option's `<small>` is 12 words at most.
-- No paragraph between a claim and its exhibit. If the exhibit needs explaining, pick a better exhibit.
-
-`pack.mjs` warns about some STE errors: common unapproved words, contractions, *has/have* tenses, the passive voice and long sentences. It does not know the full dictionary, so a clean run does not prove that the text is STE.
+一个图注解释一项要点。不要在主张与展示材料之间添加重复解释。`pack.mjs` 保留结构和引用检查；中文不适用英文词数、词形与语法警告。打包通过不代表已完整检查中文 STE。
 
 ## Steps
 

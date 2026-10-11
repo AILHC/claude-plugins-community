@@ -1,0 +1,5 @@
+interface:
+  display_name: "HTML Plan"
+  short_description: "手动生成可批注的 HTML 计划"
+policy:
+  allow_implicit_invocation: false

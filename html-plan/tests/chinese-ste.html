@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>取消任务</title>
+<link rel="stylesheet" href="../skills/html-plan/runtime/htmlplan.css">
+<script src="../skills/html-plan/runtime/htmlplan.js" defer></script>
+<body><h1>取消任务</h1><main><doc-plan>
+<doc-claim id="cancel"><p>用户可能可以取消任务。</p>
+<doc-schema id="record" lang="ts" caption="保留状态。"><script type="text/plain">type State = 'pending' | 'cancelled';</script></doc-schema>
+<doc-ask id="decision"><p>任务开始后是否取消？</p><label><input type="radio" name="cancel" value="no" checked>不取消</label><label><input type="radio" name="cancel" value="yes">尝试取消</label></doc-ask>
+</doc-claim>
+<doc-claim aux="scope"><p>不改变已完成的任务。</p></doc-claim>
+</doc-plan><p>文中的 should 与 might 保留原意。</p></main></body></html>

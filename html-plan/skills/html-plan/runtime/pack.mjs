@@ -57,7 +57,9 @@ const stamp = (f, wt) => { for (const r of roots) { const rr = real(r); if (!rr 
 const REF_OK = /^[A-Za-z0-9][\w.\/^~@{}-]*$/;
 const gitShow = (ref, p) => { if (!REF_OK.test(ref) || /(^|\/)\.\.(\/|$)/.test(p) || p.startsWith('/') || p.startsWith('-') || SECRET_NAME.test(p)) { if (!refused.has(ref + ':' + p)) { refused.add(ref + ':' + p); err(`ref="${ref}" with "${p}" — not a plain git ref and a path inside the repo; not running git`); } return null; }
   for (const r of roots) { try { return { text: git(r, 'cat-file', 'blob', `${ref}:${p}`), where: `${r}@${ref}` }; } catch {} } return null; };
-const wc = (t) => String(t || '').trim().split(/\s+/).filter(Boolean).length;
+// 中文按引用的 STE 规则人工审阅，不套用英文词数阈值。
+const hasChinese = (t) => /\p{Script=Han}/u.test(String(t || ''));
+const wc = (t) => hasChinese(t) ? 0 : String(t || '').trim().split(/\s+/).filter(Boolean).length;
 const stripTags = (t) => t.replace(/<[^>]+>/g, ' ');
 
 /* ── document-level checks ── */
@@ -218,7 +220,7 @@ if (/<doc-plan\b/.test(html)) {
   const walk = (n) => { const at = `claim ${n.no}`;
     if (n.claim == null && !n.a.at) err(`${at}: no claim — the first child must be a <p> with one sentence (or give it at="path:line")`);
     if (n.claim && wc(n.claim) > 16) warn(`${at}: the claim is ${wc(n.claim)} words — one short sentence (≤ ~12) that can be true or false`);
-    if (n.claim && n.l <= 2 && !n.a.aux && !/[.?!]$/.test(n.claim)) warn(`${at}: "${n.claim.slice(0, 40)}" — write a full sentence with a verb, not a heading`);
+    if (n.claim && n.l <= 2 && !n.a.aux && !/[.?!。？！]$/.test(n.claim)) warn(`${at}: "${n.claim.slice(0, 40)}" — write a full sentence with a verb, not a heading`);
     if (n.ex.length > 1) warn(`${at}: ${n.ex.length} exhibits (${n.ex.join(', ')}) — one per claim; give the others their own child claims`);
     if (!n.ex.length && !n.kids.length && n.a.aux !== 'scope') warn(`${at}: nothing under it — add the exhibit that proves it`);
     if (n.kids.length > 5) warn(`${at}: ${n.kids.length} child claims — 5 at most; group them`);
@@ -249,6 +251,7 @@ if (/<doc-plan\b/.test(html)) {   // a plan starts with a title, not a label lin
   if (slow) warn(`${slow} sentence${slow > 1 ? 's' : ''} over 25 words — split them; one idea per sentence`);
   if (total > 350 || (blocks && total / blocks > 45)) warn(`${total} words of prose for ${blocks} block${blocks === 1 ? '' : 's'} — aim for ≤ 350 words and ≤ ~30 per block; cut, or show it as a block`);
   // ASD-STE100 (Simplified Technical English). This is a partial check: it knows a few common unapproved words and the countable writing rules, not the full dictionary.
+  if (!hasChinese(stripTags(bare))) {
   const STE = { utilize: 'use', utilizes: 'uses', leverage: 'use', leverages: 'uses', facilitate: 'help', facilitates: 'helps', 'in order to': 'to', subsequently: 'then', aforementioned: 'this', 'prior to': 'before', additionally: 'also', furthermore: 'also', however: 'but', comprehensive: 'full', robust: 'strong', seamless: 'smooth', seamlessly: 'smoothly', numerous: 'many', commence: 'start', commences: 'starts', begin: 'start', begins: 'starts', terminate: 'stop', terminates: 'stops', demonstrate: 'show', demonstrates: 'shows', indicate: 'show', indicates: 'shows', ensure: 'make sure', ensures: 'makes sure', verify: 'make sure', verifies: 'makes sure', perform: 'do', performs: 'does', 'carry out': 'do', 'carries out': 'does', obtain: 'get', obtains: 'gets', provide: 'give', provides: 'gives', should: 'must', shall: 'must', might: 'can', 'with respect to': 'about', 'due to the fact that': 'because' };
   const prose = stripTags(bare.replace(/<(code|kbd|pre)\b[\s\S]*?<\/\1>/gi, ' ')); const text = prose.toLowerCase();
   const hits = Object.keys(STE).filter((w) => new RegExp(`\\b${w}\\b`).test(text)); if (/[a-z,] may\b/.test(prose)) { hits.push('may'); STE.may = 'can'; }
@@ -259,6 +262,7 @@ if (/<doc-plan\b/.test(html)) {   // a plan starts with a title, not a label lin
   if (perfect.length) warn(`ASD-STE100: use simple tenses, not "has/have + verb" — ${perfect.slice(0, 4).map((x) => `"${x}"`).join(', ')}`);
   const passive = [...new Set(text.match(/\b(?:is|are|was|were|be|been|being) (?:\w+ed|written|sent|made|done|shown|taken|given|kept|held|read|run|set|put|built|chosen) by\b/g) || [])];
   if (passive.length) warn(`ASD-STE100: use the active voice — ${passive.slice(0, 4).map((x) => `"${x}"`).join(', ')} (say who does it first)`);
+  }
   let six = 0; for (const m of bare.matchAll(/<(p|li|dd|doc-note)\b[^>]*>([\s\S]*?)<\/\1>/gi)) if (stripTags(m[2]).split(/(?<=[.!?])\s+/).filter((x) => x.trim()).length > 6) six++;
   if (six) warn(`ASD-STE100: ${six} paragraph${six > 1 ? 's' : ''} with more than 6 sentences — split`); }
 
